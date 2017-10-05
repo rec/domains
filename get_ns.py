@@ -1,37 +1,23 @@
-from os import listdir
-from os.path import isfile, join
+import os
+
 path = "/net/u/1/j/jongiles/scripts/domains/names"
-test_string1 = "Name server"
-test_string2 = "name server"
-test_string3 = "Name Server"
 
+TEST_STRINGS = "Name server", "name server", "Name Server"
 active_domains = []
-inactive_domains = []
 
-domainfiles = [f for f in listdir(path) if isfile(join(path, f))]
-##	print (domainfiles)
-for item in domainfiles:
-	no_nameserver = 'False'
-	print(item)
-	fullpath = join(path,item)
-	with open(fullpath) as file_object:
-		lines = file_object.readlines()
-	for line in lines:
-		line=line.strip()
-		if test_string1 in line: 
-			print(line)
-			break
-		elif test_string2 in line:
-                        print(line)
-			break
-                elif test_string3 in line:
-                        print(line)
-			break
-		else:
-			no_nameserver = 'True'
+def is_active_line(line):
+    """Return true if the line of the file indicates that the domain is active.
+    """
+    return any(ts in line.decode() for ts in TEST_STRINGS)
 
-	if no_nameserver == 'True' :
-		inactive_domains.append(item)
-		
+
+def is_active_domain(f):
+    return any(is_active_line(line) for line in open(f, 'rb'))
+
+
+directory = [os.path.join(path, f) for f in os.listdir(path)]
+domainfiles = [f for f in directory if os.path.isfile(f)]
+inactive_domains = [f for f in domainfiles if not is_active_domain(f)]
+
 print("This is a list of inactive domains")
 print(inactive_domains)
