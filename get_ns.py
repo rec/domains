@@ -13,19 +13,19 @@ class Domain:
 
 def report_inactive(domains):
     print('Inactive domains:')
-    for k, d in sorted(domains.items()):
-        if not d.active_lines:
-            print('   ', k)
+    for name, domain in sorted(domains.items()):
+        if not domain.active_lines:
+            print('   ', name)
 
     print()
 
 
 def report_active(domains):
     print('Active domains:')
-    for k, d in sorted(domains.items()):
-        if d.active_lines:
-            print('   ', k)
-            for line in d.active_lines:
+    for name, domain in sorted(domains.items()):
+        if domain.active_lines:
+            print('   ', name)
+            for line in domain.active_lines:
                 print('        ', line)
             print()
 
