@@ -1,33 +1,40 @@
 import os, sys
 
-
-DEFAULT_PATH = '/net/u/1/j/jongiles/scripts/domains/names'
-PATH = (sys.argv[1:] or [DEFAULT_PATH])[0]
-TEST_STRINGS = 'Name server', 'name server', 'Name Server'
+MATCH = 'name server'
 
 
-def is_active_line(line):
-    """Return true if the line of the file indicates that the domain is active.
-    """
-    return any(ts in line.decode() for ts in TEST_STRINGS)
-
-def is_active_domain(f):
-    return any(is_active_line(line) for line in open(f, 'rb'))
-
-def is_ns_in_domain(f):
-    return [line for line in open(f, 'rb') if is_active_line(line)]
+class Domain:
+    def __init__(self, path, name):
+        self.name = name
+        filename = os.path.join(path, name)
+        self.data = [line.decode().strip() for line in open(filename, 'rb')]
+        self.active_lines = [i for i in self.data if MATCH in i.lower()]
 
 
-directory = [os.path.join(PATH, f) for f in os.listdir(PATH)]
-domainfiles = [f for f in directory if os.path.isfile(f)]
-inactive_domains = [f.replace(PATH + '/', '') for f in domainfiles if not is_active_domain(f)]
-active_domains = [f.replace(PATH + '/', '') for f in domainfiles if is_active_domain(f)]
-name_servers = [f for f in active_domains if is_ns_in_domain(os.path.join(PATH, f))]
+def report_inactive(domains):
+    print('Inactive domains:')
+    for k, d in sorted(domains.items()):
+        if not d.active_lines:
+            print('   ', k)
+
+    print()
 
 
-print("This is a list of inactive domains")
-print(inactive_domains)
-print("This is a list of active domains")
-print(active_domains)
-print("A list of nameservers")
-print(name_servers)
+def report_active(domains):
+    print('Active domains:')
+    for k, d in sorted(domains.items()):
+        if d.active_lines:
+            print('   ', k)
+            for line in d.active_lines:
+                print('        ', line)
+            print()
+
+
+def print_domains(path='/net/u/1/j/jongiles/scripts/domains/names'):
+    domains = {name: Domain(path, name) for name in os.listdir(path)}
+    report_inactive(domains)
+    report_active(domains)
+
+
+if __name__ == '__main__':
+    print_domains(*sys.argv[1:])
