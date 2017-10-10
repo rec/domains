@@ -1,8 +1,8 @@
-import os
+import os, sys
 
-path = "/net/u/1/j/jongiles/scripts/domains/names"
 
-TEST_STRINGS = "Name server", "name server", "Name Server"
+path = '/net/u/1/j/jongiles/scripts/domains/names'
+TEST_STRINGS = 'Name server', 'name server', 'Name Server'
 active_domains = []
 
 def is_active_line(line):
