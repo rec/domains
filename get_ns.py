@@ -1,9 +1,10 @@
 import os, sys
 
 
-path = '/net/u/1/j/jongiles/scripts/domains/names'
+DEFAULT_PATH = '/net/u/1/j/jongiles/scripts/domains/names'
+PATH = (sys.argv[1:] or [DEFAULT_PATH])[0]
 TEST_STRINGS = 'Name server', 'name server', 'Name Server'
-active_domains = []
+
 
 def is_active_line(line):
     """Return true if the line of the file indicates that the domain is active.
@@ -17,11 +18,13 @@ def is_ns_in_domain(f):
     return [line for line in open(f, 'rb') if is_active_line(line)]
 
 
-directory = [os.path.join(path, f) for f in os.listdir(path)]
+directory = [os.path.join(PATH, f) for f in os.listdir(PATH)]
 domainfiles = [f for f in directory if os.path.isfile(f)]
-inactive_domains = [f.replace( path+'/', '') for f in domainfiles if not is_active_domain(f)]
-active_domains = [f.replace( path+'/', '') for f in domainfiles if is_active_domain(f)]
-name_servers = [f for f in active_domains if is_ns_in_domain(os.path.join(path, f))]
+inactive_domains = [f.replace(PATH + '/', '') for f in domainfiles if not is_active_domain(f)]
+active_domains = [f.replace(PATH + '/', '') for f in domainfiles if is_active_domain(f)]
+name_servers = [f for f in active_domains if is_ns_in_domain(os.path.join(PATH, f))]
+
+
 print("This is a list of inactive domains")
 print(inactive_domains)
 print("This is a list of active domains")
