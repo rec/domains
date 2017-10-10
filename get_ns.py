@@ -10,21 +10,18 @@ def is_active_line(line):
     """
     return any(ts in line.decode() for ts in TEST_STRINGS)
 
-def is_active_ns(line):
-    return (ts in line.decode() for ts in TEST_STRINGS)
-
 def is_active_domain(f):
     return any(is_active_line(line) for line in open(f, 'rb'))
 
 def is_ns_in_domain(f):
-    return (is_active_ns(line) for line in open(f, 'rb'))
+    return [line for line in open(f, 'rb') if is_active_line(line)]
 
 
 directory = [os.path.join(path, f) for f in os.listdir(path)]
 domainfiles = [f for f in directory if os.path.isfile(f)]
 inactive_domains = [f.replace( path+'/', '') for f in domainfiles if not is_active_domain(f)]
 active_domains = [f.replace( path+'/', '') for f in domainfiles if is_active_domain(f)]
-name_servers = [f for f in active_domains if is_ns_in_domain(f.append(path+'/'))]
+name_servers = [f for f in active_domains if is_ns_in_domain(os.path.join(path, f))]
 print("This is a list of inactive domains")
 print(inactive_domains)
 print("This is a list of active domains")
